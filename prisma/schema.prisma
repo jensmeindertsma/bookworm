@@ -1,0 +1,16 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("PRISMA_DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+
+  previewFeatures = ["driverAdapters", "queryCompiler"]
+}
+
+model Book {
+  id   String @id @default(uuid())
+  name String
+}

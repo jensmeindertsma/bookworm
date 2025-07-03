@@ -1,0 +1,44 @@
+# macOS
+.DS_Store
+
+# PNPM
+/node_modules/
+
+# React Router
+/.react-router/
+/build/
+
+# Prisma
+/app/generated/prisma/
+/data/
+
+# GitHub
+/.github/
+
+# VSCode
+/.vscode/
+
+# Git
+/.gitignore
+
+# Node.js
+/.node_version
+
+# Secrets
+/.env
+/.env.example
+
+# Prettier
+/.prettierrc.json
+
+# ESLint
+/.eslintcache
+/eslint.config.ts
+
+# Docker
+/.dockerignore
+/docker-compose.yml
+
+# Other
+/LICENSE.md
+/README.md

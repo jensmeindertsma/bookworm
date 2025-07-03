@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# PNPM
+/node_modules/
+
+# React Router
+/.react-router/
+/build/
+
+# Prisma
+/app/generated/prisma/
+/data/
+
+# Secrets
+/.env
+
+# ESLint
+.eslintcache

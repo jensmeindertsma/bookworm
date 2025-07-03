@@ -1,0 +1,14 @@
+services:
+  app:
+    image: bookworm:latest
+    build:
+      context: .
+    environment:
+      - PORT=1312
+      - APPLICATION_DATABASE_URL=file:/data/database.db
+      - PRISMA_DATABASE_URL=file:/data/database.db
+      - SESSION_SECRET=caterpillar
+    ports:
+      - "1312:1312"
+    volumes:
+      - ./data:/data
