@@ -6,16 +6,16 @@
   "scripts": {
     "build": "prisma generate && react-router build",
     "clean": "rimraf build",
-    "database:generate": "prisma generate && prettier --write .",
-    "database:migrate": "prisma migrate dev && prettier --write .",
-    "database:reset": "prisma migrate reset && prettier --write .",
-    "dev": "prisma generate && prettier --write . && react-router dev",
+    "database:generate": "prisma generate",
+    "database:migrate": "prisma migrate dev",
+    "database:reset": "prisma migrate reset",
+    "dev": "prisma generate && react-router dev",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "lint:check": "eslint --cache --max-warnings 0 .",
     "lint:fix": "eslint --cache --fix .",
     "start": "dotenv -- react-router-serve ./build/server/index.js",
-    "typecheck": "prisma generate && prettier --write . && react-router typegen && tsc",
+    "typecheck": "prisma generate && react-router typegen && tsc",
     "typegen": "react-router typegen"
   },
   "dependencies": {
