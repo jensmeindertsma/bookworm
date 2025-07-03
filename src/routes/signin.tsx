@@ -27,7 +27,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const session = await redirectUser({ request, redirectTo: "/" });
+  const session = await redirectUser({ request, redirectTo: "/dashboard" });
 
   const formData = await request.formData();
   const validation = await z
