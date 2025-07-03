@@ -1,7 +1,13 @@
-import { data } from "react-router";
+import { data, useLocation } from "react-router";
 
 export default function NotFound() {
-  return <h1>Not Found!</h1>;
+  const { pathname } = useLocation();
+
+  return (
+    <h1>
+      Not Found! <pre>{pathname}</pre> does not exist
+    </h1>
+  );
 }
 
 export function loader() {
