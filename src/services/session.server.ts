@@ -3,7 +3,6 @@ import {
   createCookie,
   createCookieSessionStorage,
   redirect,
-  type Session,
 } from "react-router";
 import z from "zod";
 
@@ -17,78 +16,20 @@ const sessionStorage = createCookieSessionStorage({
   }),
 });
 
-function createInterface(session: Session) {
-  return {
-    id(): string | null {
-      const validation = z.string().safeParse(session.get("id"));
+type UnauthenticatedSession = {
+  isAuthenticated: false;
+  commit(options: { id: string; redirectTo: string }): Promise<Response>;
+};
 
-      if (validation.success) {
-        return validation.data;
-      } else {
-        return null;
-      }
-    },
+type AuthenticatedSession = {
+  isAuthenticated: true;
+  id: string;
+  destroy(options: { redirectTo: string }): Promise<Response>;
+};
 
-    async commit({ id, redirectTo }: { id: string; redirectTo: string }) {
-      session.set("id", id);
-
-      return redirect(redirectTo, {
-        headers: {
-          "Set-Cookie": await sessionStorage.commitSession(session),
-        },
-      });
-    },
-
-    async destroy({ redirectTo }: { redirectTo: string }) {
-      return redirect(redirectTo, {
-        headers: {
-          "Set-Cookie": await sessionStorage.destroySession(session),
-        },
-      });
-    },
-  };
-}
-
-export async function getSession(request: Request) {
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie"),
-  );
-
-  return createInterface(session);
-}
-
-export async function verifySession({
-  request,
-  redirectTo,
-}: {
-  request: Request;
-  redirectTo: string;
-}) {
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie"),
-  );
-
-  const validation = z.string().safeParse(session.get("id"));
-
-  if (!validation.success) {
-    throw redirect(redirectTo);
-  }
-
-  const { destroy } = createInterface(session);
-
-  return {
-    id: validation.data,
-    destroy,
-  };
-}
-
-export async function redirectUser({
-  request,
-  redirectTo,
-}: {
-  request: Request;
-  redirectTo: string;
-}) {
+export async function getSession(
+  request: Request,
+): Promise<UnauthenticatedSession | AuthenticatedSession> {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie"),
   );
@@ -96,12 +37,61 @@ export async function redirectUser({
   const validation = z.string().safeParse(session.get("id"));
 
   if (validation.success) {
-    throw redirect(redirectTo);
+    return {
+      isAuthenticated: true,
+
+      id: validation.data,
+
+      async destroy({ redirectTo }: { redirectTo: string }) {
+        return redirect(redirectTo, {
+          headers: {
+            "Set-Cookie": await sessionStorage.destroySession(session),
+          },
+        });
+      },
+    };
+  } else {
+    return {
+      isAuthenticated: false,
+
+      async commit({ id, redirectTo }: { id: string; redirectTo: string }) {
+        session.set("id", id);
+
+        return redirect(redirectTo, {
+          headers: {
+            "Set-Cookie": await sessionStorage.commitSession(session),
+          },
+        });
+      },
+    };
   }
+}
 
-  const { commit } = createInterface(session);
+type VerifierOptions = {
+  request: Request;
+  redirectTo: string;
+};
 
-  return {
-    commit,
-  };
+export async function redirectUser({ request, redirectTo }: VerifierOptions) {
+  {
+    const session = await getSession(request);
+
+    if (session.isAuthenticated) {
+      throw redirect(redirectTo);
+    } else {
+      return session;
+    }
+  }
+}
+
+export async function verifySession({ request, redirectTo }: VerifierOptions) {
+  {
+    const session = await getSession(request);
+
+    if (session.isAuthenticated) {
+      return session;
+    } else {
+      throw redirect(redirectTo);
+    }
+  }
 }

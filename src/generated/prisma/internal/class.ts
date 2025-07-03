@@ -58,8 +58,8 @@ const config: runtime.GetPrismaClientConfig = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"sqlite\"\n  url      = env(\"PRISMA_DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n\n  previewFeatures = [\"driverAdapters\", \"queryCompiler\"]\n}\n\nmodel Book {\n  id   String @id @default(uuid())\n  name String\n}\n",
-  "inlineSchemaHash": "b8cc141e708c353782f4442d1ae3f958953d8997fa2100601e6b96a0c5dc2799",
+  "inlineSchema": "datasource db {\n  provider = \"sqlite\"\n  url      = env(\"PRISMA_DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n\n  previewFeatures = [\"driverAdapters\", \"queryCompiler\"]\n}\n\nmodel User {\n  id           String @id @default(uuid())\n  email        String @unique\n  passwordHash String\n\n  name  String\n  books Book[]\n}\n\nmodel Book {\n  id     String @id @default(uuid())\n  name   String\n  user   User   @relation(fields: [userId], references: [id])\n  userId String\n}\n",
+  "inlineSchemaHash": "d04bc105a7399b2f8576e6b16f28608b0fdd87f95794b35b5bd718871cc03200",
   "copyEngine": true,
   "runtimeDataModel": {
     "models": {},
@@ -69,7 +69,7 @@ const config: runtime.GetPrismaClientConfig = {
   "dirname": ""
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Book\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"books\",\"kind\":\"object\",\"type\":\"Book\",\"relationName\":\"BookToUser\"}],\"dbName\":null},\"Book\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"BookToUser\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 config.engineWasm = undefined
 config.compilerWasm = {
   getRuntime: async () => await import("@prisma/client/runtime/query_compiler_bg.sqlite.mjs"),
@@ -106,8 +106,8 @@ export interface PrismaClientConstructor {
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more Books
-   * const books = await prisma.book.findMany()
+   * // Fetch zero or more Users
+   * const users = await prisma.user.findMany()
    * ```
    * 
    * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
@@ -127,8 +127,8 @@ export interface PrismaClientConstructor {
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Books
- * const books = await prisma.book.findMany()
+ * // Fetch zero or more Users
+ * const users = await prisma.user.findMany()
  * ```
  * 
  * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
@@ -230,6 +230,16 @@ export interface PrismaClient<
   }>>
 
       /**
+   * `prisma.user`: Exposes CRUD operations for the **User** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Users
+    * const users = await prisma.user.findMany()
+    * ```
+    */
+  get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.book`: Exposes CRUD operations for the **Book** model.
     * Example usage:
     * ```ts
