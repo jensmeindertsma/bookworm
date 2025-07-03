@@ -1,20 +1,23 @@
 import type { Route } from "./+types/signup";
 import { database } from "~/services/database.server";
+import { convertValidationError } from "~/services/form.server";
 import { redirectUser } from "~/services/session.server";
 import bcrypt from "bcrypt";
 import { data, Form } from "react-router";
 import z from "zod";
 
-export default function SignUp({ actionData }: Route.ComponentProps) {
+export default function SignUp({ actionData: feedback }: Route.ComponentProps) {
   return (
     <>
       <h1>Sign Up</h1>
       <Form method="post">
         <label htmlFor="name">Name</label>
         <input type="text" required id="name" name="name" minLength={2} />
+        {feedback?.name && <p>{feedback.name}</p>}
 
         <label htmlFor="email">Email Address</label>
         <input type="email" required id="email" name="email" />
+        {feedback?.email && <p>{feedback.email}</p>}
 
         <label htmlFor="password">Password</label>
         <input
@@ -24,18 +27,19 @@ export default function SignUp({ actionData }: Route.ComponentProps) {
           name="password"
           minLength={8}
         />
+        {feedback?.password && <p>{feedback.password}</p>}
 
         <label htmlFor="confirmPassword">Confirm Password</label>
         <input
-          type="confirmPassword"
+          type="password"
           required
           id="confirmPassword"
           name="confirmPassword"
           minLength={8}
         />
+        {feedback?.confirmPassword && <p>{feedback.confirmPassword}</p>}
 
         <button type="submit">Sign Up</button>
-        {actionData && <strong>{JSON.stringify(actionData, null, 2)}</strong>}
       </Form>
     </>
   );
@@ -67,7 +71,7 @@ export async function action({ request }: Route.ActionArgs) {
     .safeParseAsync(Object.fromEntries(formData));
 
   if (!validation.success) {
-    return data({ error: validation.error }, 400);
+    return data(convertValidationError(validation.error), 400);
   }
 
   const { name, email, password } = validation.data;
@@ -83,8 +87,10 @@ export async function action({ request }: Route.ActionArgs) {
   if (existingUser) {
     return data(
       {
-        field: "email",
-        error: "This email address is already in use",
+        name: null,
+        email: "This email address is already in use",
+        password: null,
+        confirmPassword: null,
       },
       400,
     );

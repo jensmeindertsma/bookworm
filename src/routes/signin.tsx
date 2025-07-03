@@ -1,20 +1,23 @@
 import type { Route } from "./+types/signin";
 import { database } from "~/services/database.server";
+import { convertValidationError } from "~/services/form.server";
 import { redirectUser } from "~/services/session.server";
 import bcrypt from "bcrypt";
 import { data, Form } from "react-router";
 import z from "zod";
 
-export default function SignIn() {
+export default function SignIn({ actionData: feedback }: Route.ComponentProps) {
   return (
     <>
       <h1>Sign In</h1>
       <Form method="post">
         <label htmlFor="email">Email Address</label>
         <input type="email" required id="email" name="email" />
+        {feedback?.email && <p>{feedback.email}</p>}
 
         <label htmlFor="password">Password</label>
         <input type="password" required id="password" name="password" />
+        {feedback?.password && <p>{feedback.password}</p>}
 
         <button type="submit">Sign In</button>
       </Form>
@@ -38,7 +41,7 @@ export async function action({ request }: Route.ActionArgs) {
     .safeParseAsync(Object.fromEntries(formData));
 
   if (!validation.success) {
-    return data(validation.error, 400);
+    return data(convertValidationError(validation.error), 400);
   }
 
   const { email, password } = validation.data;
@@ -53,7 +56,7 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (!user) {
     return data(
-      { field: "email", error: "No user with this email address!" },
+      { email: "No user with this email address", password: null },
       400,
     );
   }
@@ -63,7 +66,7 @@ export async function action({ request }: Route.ActionArgs) {
   const passwordMatched = await bcrypt.compare(password, passwordHash);
 
   if (!passwordMatched) {
-    return data({}, 400);
+    return data({ email: null, password: "Incorrect password" }, 400);
   }
 
   return await session.commit({ id, redirectTo: "/" });
