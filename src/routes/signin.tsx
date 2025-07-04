@@ -1,6 +1,6 @@
 import type { Route } from "./+types/signin";
 import { database } from "~/services/database.server";
-import { convertValidationError } from "~/services/form.server";
+import { convertFormError } from "~/services/form.server";
 import { redirectUser } from "~/services/session.server";
 import bcrypt from "bcrypt";
 import { data, Form } from "react-router";
@@ -33,18 +33,18 @@ export async function action({ request }: Route.ActionArgs) {
   const session = await redirectUser({ request, redirectTo: "/dashboard" });
 
   const formData = await request.formData();
-  const validation = await z
+  const { error, data: fields } = z
     .object({
       email: z.string(),
       password: z.string(),
     })
-    .safeParseAsync(Object.fromEntries(formData));
+    .safeParse(Object.fromEntries(formData));
 
-  if (!validation.success) {
-    return data(convertValidationError(validation.error), 400);
+  if (error) {
+    return data(convertFormError(error), 400);
   }
 
-  const { email, password } = validation.data;
+  const { email, password } = fields;
 
   const user = await database.user.findUnique({
     where: { email },

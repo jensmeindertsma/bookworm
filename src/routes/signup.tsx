@@ -1,6 +1,6 @@
 import type { Route } from "./+types/signup";
 import { database } from "~/services/database.server";
-import { convertValidationError } from "~/services/form.server";
+import { convertFormError } from "~/services/form.server";
 import { redirectUser } from "~/services/session.server";
 import bcrypt from "bcrypt";
 import { data, Form } from "react-router";
@@ -53,7 +53,7 @@ export async function action({ request }: Route.ActionArgs) {
   const session = await redirectUser({ request, redirectTo: "/dashboard" });
 
   const formData = await request.formData();
-  const validation = await z
+  const validation = z
     .object({
       name: z.string().min(2, "Your name must be at least 2 characters long"),
       email: z.string().email("Please provide a valid email address"),
@@ -68,10 +68,10 @@ export async function action({ request }: Route.ActionArgs) {
       path: ["confirmPassword"],
       message: "Please make sure both passwords are the same",
     })
-    .safeParseAsync(Object.fromEntries(formData));
+    .safeParse(Object.fromEntries(formData));
 
   if (!validation.success) {
-    return data(convertValidationError(validation.error), 400);
+    return data(convertFormError(validation.error), 400);
   }
 
   const { name, email, password } = validation.data;

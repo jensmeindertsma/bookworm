@@ -1,22 +1,38 @@
 import type { ZodError } from "zod";
 
-export function convertValidationError<F extends Record<string, unknown>>(
+export function convertFormError<F extends Record<string, unknown>>(
   error: ZodError<F>,
 ): { [K in keyof F]: string | null } {
-  const result = {} as { [K in keyof F]: string | null };
+  const allKeys = Object.keys(error.flatten().fieldErrors) as Array<keyof F>;
+  const result = Object.fromEntries(allKeys.map((key) => [key, null])) as {
+    [K in keyof F]: string | null;
+  };
 
   for (const issue of error.errors) {
-    const path = issue.path[0];
-    if (typeof path === "string" && !(path in result)) {
-      result[path as keyof F] = issue.message;
-    }
-  }
-
-  for (const key in error.flatten().fieldErrors) {
-    if (!(key in result)) {
-      result[key as keyof F] = null;
+    const key = issue.path[0];
+    if (typeof key === "string" && key in result) {
+      result[key as keyof F] = issue.message;
     }
   }
 
   return result;
+}
+
+export function getFieldError<
+  T extends { kind: string },
+  K extends T["kind"],
+  F extends Exclude<keyof Extract<T, { kind: K }> & string, "kind">,
+>({
+  formError,
+  field,
+}: {
+  formError: ZodError<T>;
+  kind: K;
+  field: F;
+}): string | null {
+  return (
+    (formError as ZodError<Record<string, unknown>>).flatten().fieldErrors[
+      field
+    ]?.[0] ?? null
+  );
 }
