@@ -1,9 +1,10 @@
-FROM node:22.17.0-alpine AS base
+FROM node:24.3.0-alpine AS base
 RUN corepack enable
 
 FROM base AS build
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN apk add build-base python3
 RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm run build
