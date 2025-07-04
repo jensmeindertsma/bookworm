@@ -19,46 +19,70 @@ export type BookModel = runtime.Types.Result.DefaultSelection<Prisma.$BookPayloa
 
 export type AggregateBook = {
   _count: BookCountAggregateOutputType | null
+  _avg: BookAvgAggregateOutputType | null
+  _sum: BookSumAggregateOutputType | null
   _min: BookMinAggregateOutputType | null
   _max: BookMaxAggregateOutputType | null
+}
+
+export type BookAvgAggregateOutputType = {
+  progress: number | null
+}
+
+export type BookSumAggregateOutputType = {
+  progress: number | null
 }
 
 export type BookMinAggregateOutputType = {
   id: string | null
   name: string | null
   userId: string | null
+  progress: number | null
 }
 
 export type BookMaxAggregateOutputType = {
   id: string | null
   name: string | null
   userId: string | null
+  progress: number | null
 }
 
 export type BookCountAggregateOutputType = {
   id: number
   name: number
   userId: number
+  progress: number
   _all: number
 }
 
+
+export type BookAvgAggregateInputType = {
+  progress?: true
+}
+
+export type BookSumAggregateInputType = {
+  progress?: true
+}
 
 export type BookMinAggregateInputType = {
   id?: true
   name?: true
   userId?: true
+  progress?: true
 }
 
 export type BookMaxAggregateInputType = {
   id?: true
   name?: true
   userId?: true
+  progress?: true
 }
 
 export type BookCountAggregateInputType = {
   id?: true
   name?: true
   userId?: true
+  progress?: true
   _all?: true
 }
 
@@ -100,6 +124,18 @@ export type BookAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: BookAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: BookSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: BookMinAggregateInputType
@@ -130,6 +166,8 @@ export type BookGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: BookCountAggregateInputType | true
+  _avg?: BookAvgAggregateInputType
+  _sum?: BookSumAggregateInputType
   _min?: BookMinAggregateInputType
   _max?: BookMaxAggregateInputType
 }
@@ -138,7 +176,10 @@ export type BookGroupByOutputType = {
   id: string
   name: string
   userId: string
+  progress: number
   _count: BookCountAggregateOutputType | null
+  _avg: BookAvgAggregateOutputType | null
+  _sum: BookSumAggregateOutputType | null
   _min: BookMinAggregateOutputType | null
   _max: BookMaxAggregateOutputType | null
 }
@@ -165,6 +206,7 @@ export type BookWhereInput = {
   id?: Prisma.StringFilter<"Book"> | string
   name?: Prisma.StringFilter<"Book"> | string
   userId?: Prisma.StringFilter<"Book"> | string
+  progress?: Prisma.IntFilter<"Book"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -172,6 +214,7 @@ export type BookOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -182,6 +225,7 @@ export type BookWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.BookWhereInput | Prisma.BookWhereInput[]
   name?: Prisma.StringFilter<"Book"> | string
   userId?: Prisma.StringFilter<"Book"> | string
+  progress?: Prisma.IntFilter<"Book"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
@@ -189,9 +233,12 @@ export type BookOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
   _count?: Prisma.BookCountOrderByAggregateInput
+  _avg?: Prisma.BookAvgOrderByAggregateInput
   _max?: Prisma.BookMaxOrderByAggregateInput
   _min?: Prisma.BookMinOrderByAggregateInput
+  _sum?: Prisma.BookSumOrderByAggregateInput
 }
 
 export type BookScalarWhereWithAggregatesInput = {
@@ -201,11 +248,13 @@ export type BookScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Book"> | string
   name?: Prisma.StringWithAggregatesFilter<"Book"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Book"> | string
+  progress?: Prisma.IntWithAggregatesFilter<"Book"> | number
 }
 
 export type BookCreateInput = {
   id?: string
   name: string
+  progress: number
   user: Prisma.UserCreateNestedOneWithoutBooksInput
 }
 
@@ -213,11 +262,13 @@ export type BookUncheckedCreateInput = {
   id?: string
   name: string
   userId: string
+  progress: number
 }
 
 export type BookUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
   user?: Prisma.UserUpdateOneRequiredWithoutBooksNestedInput
 }
 
@@ -225,23 +276,27 @@ export type BookUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type BookCreateManyInput = {
   id?: string
   name: string
   userId: string
+  progress: number
 }
 
 export type BookUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type BookUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type BookListRelationFilter = {
@@ -258,18 +313,29 @@ export type BookCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+}
+
+export type BookAvgOrderByAggregateInput = {
+  progress?: Prisma.SortOrder
 }
 
 export type BookMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
 }
 
 export type BookMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  progress?: Prisma.SortOrder
+}
+
+export type BookSumOrderByAggregateInput = {
+  progress?: Prisma.SortOrder
 }
 
 export type BookCreateNestedManyWithoutUserInput = {
@@ -314,14 +380,24 @@ export type BookUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.BookScalarWhereInput | Prisma.BookScalarWhereInput[]
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type BookCreateWithoutUserInput = {
   id?: string
   name: string
+  progress: number
 }
 
 export type BookUncheckedCreateWithoutUserInput = {
   id?: string
   name: string
+  progress: number
 }
 
 export type BookCreateOrConnectWithoutUserInput = {
@@ -356,26 +432,31 @@ export type BookScalarWhereInput = {
   id?: Prisma.StringFilter<"Book"> | string
   name?: Prisma.StringFilter<"Book"> | string
   userId?: Prisma.StringFilter<"Book"> | string
+  progress?: Prisma.IntFilter<"Book"> | number
 }
 
 export type BookCreateManyUserInput = {
   id?: string
   name: string
+  progress: number
 }
 
 export type BookUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type BookUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type BookUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  progress?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -384,6 +465,7 @@ export type BookSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   name?: boolean
   userId?: boolean
+  progress?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["book"]>
 
@@ -391,6 +473,7 @@ export type BookSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   name?: boolean
   userId?: boolean
+  progress?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["book"]>
 
@@ -398,6 +481,7 @@ export type BookSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   name?: boolean
   userId?: boolean
+  progress?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["book"]>
 
@@ -405,9 +489,10 @@ export type BookSelectScalar = {
   id?: boolean
   name?: boolean
   userId?: boolean
+  progress?: boolean
 }
 
-export type BookOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "userId", ExtArgs["result"]["book"]>
+export type BookOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "userId" | "progress", ExtArgs["result"]["book"]>
 export type BookInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -427,6 +512,7 @@ export type $BookPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     name: string
     userId: string
+    progress: number
   }, ExtArgs["result"]["book"]>
   composites: {}
 }
@@ -854,6 +940,7 @@ export interface BookFieldRefs {
   readonly id: Prisma.FieldRef<"Book", 'String'>
   readonly name: Prisma.FieldRef<"Book", 'String'>
   readonly userId: Prisma.FieldRef<"Book", 'String'>
+  readonly progress: Prisma.FieldRef<"Book", 'Int'>
 }
     
 

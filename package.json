@@ -19,8 +19,8 @@
     "typegen": "react-router typegen"
   },
   "dependencies": {
-    "@prisma/adapter-better-sqlite3": "^6.11.0",
-    "@prisma/client": "^6.11.0",
+    "@prisma/adapter-better-sqlite3": "^6.11.1",
+    "@prisma/client": "^6.11.1",
     "@react-router/node": "^7.6.3",
     "@react-router/serve": "^7.6.3",
     "bcrypt": "^6.0.0",
@@ -29,7 +29,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^7.6.3",
-    "zod": "^3.25.71"
+    "zod": "^3.25.73"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
@@ -46,12 +46,12 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.13",
-    "prisma": "^6.11.0",
+    "prisma": "^6.11.1",
     "rimraf": "^6.0.1",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.1",
-    "vite": "^7.0.0",
+    "vite": "^7.0.2",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }

@@ -22,7 +22,7 @@ const config: runtime.GetPrismaClientConfig = {
       "value": "prisma-client"
     },
     "output": {
-      "value": "/home/jens/development/bookworm/src/generated/prisma",
+      "value": "/Users/Jens/Development/bookworm/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -31,7 +31,7 @@ const config: runtime.GetPrismaClientConfig = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "debian-openssl-3.0.x",
+        "value": "darwin-arm64",
         "native": true
       }
     ],
@@ -39,17 +39,17 @@ const config: runtime.GetPrismaClientConfig = {
       "driverAdapters",
       "queryCompiler"
     ],
-    "sourceFilePath": "/home/jens/development/bookworm/prisma/schema.prisma",
+    "sourceFilePath": "/Users/Jens/Development/bookworm/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativePath": "../../../prisma",
-  "clientVersion": "6.11.0",
-  "engineVersion": "9c30299f5a0ea26a96790e13f796dc6094db3173",
+  "clientVersion": "6.11.1",
+  "engineVersion": "f40f79ec31188888a2e33acda0ecc8fd10a853a9",
   "datasourceNames": [
     "db"
   ],
   "activeProvider": "sqlite",
-  "postinstall": false,
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -58,8 +58,8 @@ const config: runtime.GetPrismaClientConfig = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"sqlite\"\n  url      = env(\"PRISMA_DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n\n  previewFeatures = [\"driverAdapters\", \"queryCompiler\"]\n}\n\nmodel User {\n  id           String @id @default(uuid())\n  email        String @unique\n  passwordHash String\n\n  name  String\n  books Book[]\n}\n\nmodel Book {\n  id     String @id @default(uuid())\n  name   String\n  user   User   @relation(fields: [userId], references: [id])\n  userId String\n}\n",
-  "inlineSchemaHash": "d04bc105a7399b2f8576e6b16f28608b0fdd87f95794b35b5bd718871cc03200",
+  "inlineSchema": "datasource db {\n  provider = \"sqlite\"\n  url      = env(\"PRISMA_DATABASE_URL\")\n}\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n\n  previewFeatures = [\"driverAdapters\", \"queryCompiler\"]\n}\n\nmodel User {\n  id           String @id @default(uuid())\n  email        String @unique\n  passwordHash String\n\n  name  String\n  books Book[]\n}\n\nmodel Book {\n  id       String @id @default(uuid())\n  name     String\n  user     User   @relation(fields: [userId], references: [id])\n  userId   String\n  progress Int\n}\n",
+  "inlineSchemaHash": "17066c9a5a84355492698a3762a0dbd122f6a7d36a01008b9231bb8c519b7ba4",
   "copyEngine": true,
   "runtimeDataModel": {
     "models": {},
@@ -69,7 +69,7 @@ const config: runtime.GetPrismaClientConfig = {
   "dirname": ""
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"books\",\"kind\":\"object\",\"type\":\"Book\",\"relationName\":\"BookToUser\"}],\"dbName\":null},\"Book\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"BookToUser\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"passwordHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"books\",\"kind\":\"object\",\"type\":\"Book\",\"relationName\":\"BookToUser\"}],\"dbName\":null},\"Book\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"BookToUser\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"progress\",\"kind\":\"scalar\",\"type\":\"Int\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 config.engineWasm = undefined
 config.compilerWasm = {
   getRuntime: async () => await import("@prisma/client/runtime/query_compiler_bg.sqlite.mjs"),
