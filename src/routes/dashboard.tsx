@@ -16,10 +16,14 @@ export default function Dashboard({
       <h1>Dashboard</h1>
       <p>Welcome back, {loaderData.name}</p>
       <hr />
+      <p>BOOKS</p>
       <ul>
         {loaderData.books.map((book) => (
           <li key={book.id}>
-            {book.name} (currently on page {book.progress})
+            <p>
+              {book.name} (currently on page {book.progress})
+            </p>
+            <p>EDIT BOOK</p>
             <Form method="post">
               <input type="hidden" name="kind" value="edit" />
 
@@ -37,9 +41,16 @@ export default function Dashboard({
 
               <button type="submit">Save progress</button>
             </Form>
+            <p>DELETE BOOK</p>
+            <Form method="post">
+              <input type="hidden" name="kind" value="delete" />
+
+              <button type="submit">Delete Book</button>
+            </Form>
           </li>
         ))}
       </ul>
+      <p>ADD BOOK</p>
       <Form method="post">
         <input type="hidden" name="kind" value="create" />
 
@@ -77,8 +88,6 @@ export async function action({ request }: Route.ActionArgs) {
 
   const formData = await request.formData();
 
-  console.log(Object.fromEntries(formData));
-
   const { error: kindError, data: kind } = z
     .enum(["create", "edit"])
     .safeParse(formData.get("kind"));
@@ -105,7 +114,7 @@ export async function action({ request }: Route.ActionArgs) {
             required_error: "This field is required",
           })
           .transform((field) => Number(field))
-          .refine((field) => !Number.isNaN(field), {
+          .refine((field) => !Number.isNaN(field) && field > 0, {
             message: "Please provide a valid progress value",
           }),
         id: z.string(),
