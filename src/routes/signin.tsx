@@ -6,11 +6,16 @@ import bcrypt from "bcrypt";
 import { data, Form } from "react-router";
 import z from "zod";
 
-export default function SignIn({ actionData: feedback }: Route.ComponentProps) {
+export default function SignIn({
+  loaderData,
+  actionData: feedback,
+}: Route.ComponentProps) {
   return (
     <>
       <h1>Sign In</h1>
       <Form method="post">
+        <input type="hidden" name="token" value={loaderData.token} />
+
         <label htmlFor="email">Email Address</label>
         <input type="email" required id="email" name="email" />
         {feedback?.email && <p>{feedback.email}</p>}
@@ -26,13 +31,23 @@ export default function SignIn({ actionData: feedback }: Route.ComponentProps) {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await redirectUser({ request, redirectTo: "/dashboard" });
+  const session = await redirectUser({ request, redirectTo: "/dashboard" });
+
+  const { token, headers } = await session.generateToken();
+
+  return data({ token }, { headers });
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const session = await redirectUser({ request, redirectTo: "/dashboard" });
+  const session = await redirectUser({
+    request,
+    redirectTo: "/dashboard",
+  });
 
   const formData = await request.formData();
+
+  session.verifyToken({ formData });
+
   const { error, data: fields } = z
     .object({
       email: z.string(),

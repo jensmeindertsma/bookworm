@@ -1,6 +1,6 @@
 import type { Route } from "./+types/main";
 import { getSession } from "~/services/session.server";
-import { Form, Link, Outlet } from "react-router";
+import { data, Form, Link, Outlet } from "react-router";
 
 export default function MainLayout({ loaderData }: Route.ComponentProps) {
   if (loaderData.isAuthenticated) {
@@ -9,6 +9,7 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
         <header>
           APP
           <Form method="post" action="/signout">
+            <input type="hidden" name="token" value={loaderData.token} />
             <button type="submit">Sign Out</button>
           </Form>
         </header>
@@ -39,7 +40,12 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { isAuthenticated } = await getSession(request);
+  const { isAuthenticated, ...session } = await getSession({ request });
 
-  return { isAuthenticated };
+  if (isAuthenticated) {
+    const { token, headers } = await session.generateToken();
+    return data({ isAuthenticated, token }, { headers });
+  }
+
+  return data({ isAuthenticated });
 }

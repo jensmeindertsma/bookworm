@@ -9,8 +9,6 @@ export default function Dashboard({
   loaderData,
   actionData: feedback,
 }: Route.ComponentProps) {
-  console.log(feedback);
-
   return (
     <>
       <h1>Dashboard</h1>
@@ -25,6 +23,7 @@ export default function Dashboard({
             </p>
             <p>EDIT BOOK</p>
             <Form method="post">
+              <input type="hidden" name="token" value={loaderData.token} />
               <input type="hidden" name="kind" value="edit" />
 
               <input type="hidden" name="id" value={book.id} />
@@ -43,6 +42,7 @@ export default function Dashboard({
             </Form>
             <p>DELETE BOOK</p>
             <Form method="post">
+              <input type="hidden" name="token" value={loaderData.token} />
               <input type="hidden" name="kind" value="delete" />
 
               <button type="submit">Delete Book</button>
@@ -52,6 +52,7 @@ export default function Dashboard({
       </ul>
       <p>ADD BOOK</p>
       <Form method="post">
+        <input type="hidden" name="token" value={loaderData.token} />
         <input type="hidden" name="kind" value="create" />
 
         <p>Add a new book</p>
@@ -66,7 +67,10 @@ export default function Dashboard({
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const session = await verifySession({ request, redirectTo: "/signin" });
+  const session = await verifySession({
+    request,
+    redirectTo: "/signin",
+  });
 
   const user = await database.user.findUnique({
     where: { id: session.id },
@@ -77,16 +81,27 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw session.destroy({ redirectTo: "/signin" });
   }
 
-  return data({
-    name: user.name,
-    books: user.books,
-  });
+  const { token, headers } = await session.generateToken();
+
+  return data(
+    {
+      name: user.name,
+      books: user.books,
+      token,
+    },
+    { headers },
+  );
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const session = await verifySession({ request, redirectTo: "/signin" });
+  const session = await verifySession({
+    request,
+    redirectTo: "/signin",
+  });
 
   const formData = await request.formData();
+
+  session.verifyToken({ formData });
 
   const { error: kindError, data: kind } = z
     .enum(["create", "edit"])
@@ -95,8 +110,6 @@ export async function action({ request }: Route.ActionArgs) {
   if (kindError) {
     throw new Error(`Invalid form kind (received ${kind})`);
   }
-
-  console.log(kind);
 
   const { data: fields, error: formError } = z
     .discriminatedUnion("kind", [
@@ -132,7 +145,6 @@ export async function action({ request }: Route.ActionArgs) {
       }
 
       case "edit": {
-        console.error(formError);
         return data(
           {
             kind,

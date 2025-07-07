@@ -46,13 +46,22 @@ export default function SignUp({ actionData: feedback }: Route.ComponentProps) {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await redirectUser({ request, redirectTo: "/dashboard" });
+  const session = await redirectUser({ request, redirectTo: "/dashboard" });
+
+  const { token, headers } = await session.generateToken();
+  return data({ token }, { headers });
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const session = await redirectUser({ request, redirectTo: "/dashboard" });
+  const session = await redirectUser({
+    request,
+    redirectTo: "/dashboard",
+  });
 
   const formData = await request.formData();
+
+  session.verifyToken({ formData });
+
   const validation = z
     .object({
       name: z.string().min(2, "Your name must be at least 2 characters long"),

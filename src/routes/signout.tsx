@@ -3,7 +3,7 @@ import { getSession } from "~/services/session.server";
 import { redirect } from "react-router";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const session = await getSession(request);
+  const session = await getSession({ request });
 
   if (session.isAuthenticated) {
     return redirect("/dashboard");
@@ -13,11 +13,15 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const session = await getSession(request);
+  const session = await getSession({ request });
 
-  if (session.isAuthenticated) {
-    return session.destroy({ redirectTo: "/signin" });
-  } else {
+  if (!session.isAuthenticated) {
     return redirect("/signin");
   }
+
+  // Validating the CSRF token is still important here.
+  const formData = await request.formData();
+  session.verifyToken({ formData });
+
+  return session.destroy({ redirectTo: "/signin" });
 }

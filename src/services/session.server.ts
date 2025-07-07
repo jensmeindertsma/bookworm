@@ -1,8 +1,10 @@
 import { getEnvironmentVariable } from "./environment.server";
+import { randomUUID } from "node:crypto";
 import {
   createCookie,
   createCookieSessionStorage,
   redirect,
+  type Session,
 } from "react-router";
 import z from "zod";
 
@@ -16,23 +18,35 @@ const sessionStorage = createCookieSessionStorage({
   }),
 });
 
+type TokenInterface = {
+  generateToken(): Promise<{ token: string; headers: Headers }>;
+  verifyToken(options: { formData: FormData }): void;
+};
+
 type UnauthenticatedSession = {
   isAuthenticated: false;
   commit(options: { id: string; redirectTo: string }): Promise<Response>;
-};
+} & TokenInterface;
 
 type AuthenticatedSession = {
   isAuthenticated: true;
   id: string;
   destroy(options: { redirectTo: string }): Promise<Response>;
+} & TokenInterface;
+
+type Options = {
+  request: Request;
+  checkToken?: boolean;
 };
 
-export async function getSession(
-  request: Request,
-): Promise<UnauthenticatedSession | AuthenticatedSession> {
+export async function getSession({
+  request,
+}: Options): Promise<UnauthenticatedSession | AuthenticatedSession> {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie"),
   );
+
+  const tokenInterface = createTokenInterface(session);
 
   const validation = z.string().safeParse(session.get("id"));
 
@@ -49,6 +63,8 @@ export async function getSession(
           },
         });
       },
+
+      ...tokenInterface,
     };
   } else {
     return {
@@ -63,8 +79,42 @@ export async function getSession(
           },
         });
       },
+
+      ...tokenInterface,
     };
   }
+}
+
+function createTokenInterface(session: Session): TokenInterface {
+  return {
+    async generateToken() {
+      const token = randomUUID();
+      const headers = new Headers();
+
+      session.set("token", token);
+      headers.set("Set-Cookie", await sessionStorage.commitSession(session));
+
+      return { token, headers };
+    },
+
+    verifyToken({ formData }) {
+      const sessionToken = session.get("token");
+
+      if (!sessionToken || typeof sessionToken !== "string") {
+        throw new Response("Missing CSRF session token!", { status: 400 });
+      }
+
+      const formToken = formData.get("token");
+
+      if (!formToken || typeof formToken !== "string") {
+        throw new Response("Missing CSRF form token!", { status: 400 });
+      }
+
+      if (sessionToken !== formToken) {
+        throw new Response("CSRF tokens did not match!", { status: 403 });
+      }
+    },
+  };
 }
 
 type VerifierOptions = {
@@ -74,7 +124,7 @@ type VerifierOptions = {
 
 export async function redirectUser({ request, redirectTo }: VerifierOptions) {
   {
-    const session = await getSession(request);
+    const session = await getSession({ request });
 
     if (session.isAuthenticated) {
       throw redirect(redirectTo);
@@ -86,7 +136,7 @@ export async function redirectUser({ request, redirectTo }: VerifierOptions) {
 
 export async function verifySession({ request, redirectTo }: VerifierOptions) {
   {
-    const session = await getSession(request);
+    const session = await getSession({ request });
 
     if (session.isAuthenticated) {
       return session;
