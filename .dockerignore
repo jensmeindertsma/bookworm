@@ -9,7 +9,7 @@
 /build/
 
 # Prisma
-/app/generated/prisma/
+/src/generated
 /data/
 
 # GitHub
