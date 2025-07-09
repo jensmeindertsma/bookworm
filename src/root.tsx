@@ -30,7 +30,7 @@ export function Layout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className="bg-white text-black dark:bg-black dark:text-white"
+      className="bg-white text-black dark:bg-gray-900 dark:text-white"
     >
       <head>
         <meta charSet="utf-8" />
@@ -38,7 +38,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="m-4">
         {children}
         <ScrollRestoration />
         <Scripts />

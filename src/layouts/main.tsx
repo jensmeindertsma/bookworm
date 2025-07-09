@@ -6,7 +6,7 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
   if (loaderData.isAuthenticated) {
     return (
       <>
-        <header>
+        <header className="bg-blue-500">
           APP
           <Form method="post" action="/signout">
             <input type="hidden" name="token" value={loaderData.token} />
@@ -20,15 +20,21 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
   } else {
     return (
       <>
-        <header>
-          <Link to="/">Bookworm</Link>
-          <nav>
-            <ul>
+        <header className="flex flex-row rounded-2xl bg-cyan-200 p-2">
+          <Link to="/" className="rounded-xl bg-white p-2">
+            <img src="/caterpillar.png" className="h-10" />
+          </Link>
+          <nav className="ml-auto">
+            <ul className="flex flex-row">
               <li>
-                <Link to="/signup">Sign Up</Link>
+                <Link to="/signup" className="block h-15 bg-green-300">
+                  Sign Up
+                </Link>
               </li>
               <li>
-                <Link to="/signin">Sign In</Link>
+                <Link to="/signin" className="block h-15 bg-green-300">
+                  Sign In
+                </Link>
               </li>
             </ul>
           </nav>
