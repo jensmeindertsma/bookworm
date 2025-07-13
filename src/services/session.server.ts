@@ -19,7 +19,7 @@ const sessionStorage = createCookieSessionStorage({
 });
 
 type TokenInterface = {
-  generateToken(): Promise<{ token: string; headers: Headers }>;
+  getToken(): Promise<{ token: string; newHeaders?: Headers }>;
   verifyToken(options: { formData: FormData }): void;
 };
 
@@ -87,14 +87,20 @@ export async function getSession({
 
 function createTokenInterface(session: Session): TokenInterface {
   return {
-    async generateToken() {
-      const token = randomUUID();
-      const headers = new Headers();
+    async getToken() {
+      const token = session.get("token");
 
-      session.set("token", token);
-      headers.set("Set-Cookie", await sessionStorage.commitSession(session));
+      if (token && typeof token === "string") {
+        return { token };
+      }
 
-      return { token, headers };
+      const newToken = randomUUID();
+      const newHeaders = new Headers();
+
+      session.set("token", newToken);
+      newHeaders.set("Set-Cookie", await sessionStorage.commitSession(session));
+
+      return { token: newToken, newHeaders };
     },
 
     verifyToken({ formData }) {

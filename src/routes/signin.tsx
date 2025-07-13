@@ -10,21 +10,58 @@ export default function SignIn({
   loaderData,
   actionData: feedback,
 }: Route.ComponentProps) {
+  const sectionStyle = "flex flex-col mb-5";
+  const labelStyle = "mb-1 underline";
+  const inputStyle =
+    "text-black dark:text-white italic placeholder:text-gray-400 placeholder:italic";
+  const errorStyle = "mt-2 underline decoration-red-600";
+
   return (
     <>
-      <h1>Sign In</h1>
-      <Form method="post">
+      <Form
+        method="post"
+        className="flex flex-col border-2 border-black p-8 dark:border-white"
+      >
         <input type="hidden" name="token" value={loaderData.token} />
 
-        <label htmlFor="email">Email Address</label>
-        <input type="email" required id="email" name="email" />
-        {feedback?.email && <p>{feedback.email}</p>}
+        <div className="mx-auto flex w-80 max-w-full flex-col md:grid md:w-full md:grid-cols-2 md:gap-4">
+          <section className={sectionStyle}>
+            <label htmlFor="email" className={labelStyle}>
+              Email Address
+            </label>
+            <input
+              type="email"
+              required
+              id="email"
+              name="email"
+              className={inputStyle}
+              placeholder="john.doe@foo.com"
+            />
+            <p className={errorStyle}>{feedback?.email}</p>
+          </section>
 
-        <label htmlFor="password">Password</label>
-        <input type="password" required id="password" name="password" />
-        {feedback?.password && <p>{feedback.password}</p>}
-
-        <button type="submit">Sign In</button>
+          <section className={sectionStyle}>
+            <label htmlFor="password" className={labelStyle}>
+              Password
+            </label>
+            <input
+              type="password"
+              required
+              id="password"
+              name="password"
+              minLength={8}
+              className={inputStyle}
+              placeholder="secret!123"
+            />
+            <p className={errorStyle}>{feedback?.password}</p>
+          </section>
+        </div>
+        <button
+          type="submit"
+          className="mt-5 w-30 bg-black p-2 text-center text-white dark:bg-white dark:text-black"
+        >
+          Sign Up
+        </button>
       </Form>
     </>
   );
@@ -33,9 +70,13 @@ export default function SignIn({
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await redirectUser({ request, redirectTo: "/dashboard" });
 
-  const { token, headers } = await session.generateToken();
+  const { token, newHeaders } = await session.getToken();
 
-  return data({ token }, { headers });
+  if (newHeaders) {
+    return data({ token }, { headers: newHeaders });
+  } else {
+    return data({ token });
+  }
 }
 
 export async function action({ request }: Route.ActionArgs) {
