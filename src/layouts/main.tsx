@@ -20,22 +20,22 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
   } else {
     return (
       <>
-        <header className="flex flex-row rounded-2xl bg-cyan-200 p-2">
-          <Link to="/" className="rounded-xl bg-white p-2">
-            <img src="/caterpillar.png" className="h-10" />
+        <header className="mb-10 flex flex-row">
+          <Link to="/" className="block h-full py-2 pr-2">
+            <span className="font-serif text-2xl font-bold">Bookworm</span>
           </Link>
-          <nav className="ml-auto">
-            <ul className="flex flex-row">
-              <li>
-                <Link to="/signup" className="block h-15 bg-green-300">
-                  Sign Up
-                </Link>
-              </li>
-              <li>
-                <Link to="/signin" className="block h-15 bg-green-300">
-                  Sign In
-                </Link>
-              </li>
+          <nav className="w-full">
+            <ul className="flex h-full flex-row items-center justify-end">
+              {[
+                ["/signup", "Sign up"],
+                ["/signin", "Sign in"],
+              ].map(([url, name]) => (
+                <li className="ml-4 hover:underline">
+                  <Link to={url} className="ml-2 flex h-full rounded-xl p-2">
+                    {name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
         </header>

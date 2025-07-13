@@ -13,8 +13,23 @@ export default function Dashboard({
     <>
       <h1>Dashboard</h1>
       <p>Welcome back, {loaderData.name}</p>
-      <hr />
-      <p>BOOKS</p>
+      <p>ADD BOOK</p>
+      <Form method="post">
+        <input type="hidden" name="token" value={loaderData.token} />
+        <input type="hidden" name="kind" value="create" />
+
+        <p>Add a new book</p>
+        <label htmlFor="name">Name</label>
+        <input type="text" required id="name" name="name" />
+        {feedback?.kind === "create" && <p>{feedback.name}</p>}
+
+        <label htmlFor="pages">Page Count</label>
+        <input type="text" required id="pages" name="pages" />
+        {feedback?.kind === "create" && <p>{feedback.pages}</p>}
+
+        <button type="submit">Add</button>
+      </Form>
+
       <ul>
         {loaderData.books.map((book) => (
           <li key={book.id}>
@@ -50,18 +65,6 @@ export default function Dashboard({
           </li>
         ))}
       </ul>
-      <p>ADD BOOK</p>
-      <Form method="post">
-        <input type="hidden" name="token" value={loaderData.token} />
-        <input type="hidden" name="kind" value="create" />
-
-        <p>Add a new book</p>
-        <label htmlFor="name" />
-        <input type="text" required id="name" name="name" />
-        {feedback?.kind === "create" && <p>{feedback.name}</p>}
-
-        <button type="submit">Add</button>
-      </Form>
     </>
   );
 }
@@ -119,6 +122,14 @@ export async function action({ request }: Route.ActionArgs) {
           required_error: "This field is required",
           invalid_type_error: "Please provide a valid name",
         }),
+        pages: z
+          .string({
+            required_error: "This field is required",
+          })
+          .transform((field) => Number(field))
+          .refine((field) => !Number.isNaN(field) && field > 0, {
+            message: "Please provide a valid progress value",
+          }),
       }),
       z.object({
         kind: z.literal("edit"),
@@ -139,7 +150,11 @@ export async function action({ request }: Route.ActionArgs) {
     switch (kind) {
       case "create": {
         return data(
-          { kind, name: getFieldError({ formError, kind, field: "name" }) },
+          {
+            kind,
+            name: getFieldError({ formError, kind, field: "name" }),
+            pages: getFieldError({ formError, kind, field: "pages" }),
+          },
           400,
         );
       }
@@ -161,6 +176,7 @@ export async function action({ request }: Route.ActionArgs) {
       await database.book.create({
         data: {
           name: fields.name,
+          pages: fields.pages,
           progress: 0,
           userId: session.id,
         },
