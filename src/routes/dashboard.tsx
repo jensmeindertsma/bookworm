@@ -1,6 +1,6 @@
 import type { Route } from "./+types/dashboard";
 import { database } from "~/services/database.server";
-import { getFieldError } from "~/services/form.server";
+import { getFormErrors } from "~/services/form.server";
 import { verifySession } from "~/services/session.server";
 import { data, Form, redirect } from "react-router";
 import z from "zod";
@@ -160,8 +160,7 @@ export async function action({ request }: Route.ActionArgs) {
         return data(
           {
             kind,
-            name: getFieldError({ formError, kind, field: "name" }),
-            pages: getFieldError({ formError, kind, field: "pages" }),
+            ...getFormErrors({ formError, kind }),
           },
           400,
         );
@@ -171,7 +170,7 @@ export async function action({ request }: Route.ActionArgs) {
         return data(
           {
             kind,
-            progress: getFieldError({ formError, kind, field: "progress" }),
+            ...getFormErrors({ formError, kind }),
           },
           400,
         );

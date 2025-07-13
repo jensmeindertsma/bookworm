@@ -18,21 +18,35 @@ export function convertFormError<F extends Record<string, unknown>>(
   return result;
 }
 
-export function getFieldError<
+export function getFormErrors<
   T extends { kind: string },
   K extends T["kind"],
   F extends Exclude<keyof Extract<T, { kind: K }> & string, "kind">,
 >({
   formError,
-  field,
 }: {
   formError: ZodError<T>;
   kind: K;
-  field: F;
-}): string | null {
-  return (
-    (formError as ZodError<Record<string, unknown>>).flatten().fieldErrors[
-      field
-    ]?.[0] ?? null
-  );
+}): Record<F, string | null> {
+  const flattened = (formError as ZodError<Record<string, unknown>>).flatten();
+
+  type Variant = Extract<T, { kind: K }>;
+  type Fields = Exclude<keyof Variant & string, "kind">;
+
+  const errors = {} as Record<Fields, string | null>;
+
+  for (const field of Object.keys(flattened.fieldErrors) as Fields[]) {
+    errors[field] =
+      (formError as ZodError<Record<string, unknown>>).flatten().fieldErrors[
+        field
+      ]?.[0] ?? null;
+  }
+
+  (Object.keys(errors) as Fields[]).forEach((field) => {
+    if (!(field in errors)) {
+      errors[field] = null;
+    }
+  });
+
+  return errors;
 }
