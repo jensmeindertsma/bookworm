@@ -84,24 +84,16 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw session.destroy({ redirectTo: "/signin" });
   }
 
-  const { token, newHeaders } = await session.getToken();
+  const { token, headers } = await session.getToken();
 
-  if (newHeaders) {
-    return data(
-      {
-        name: user.name,
-        books: user.books,
-        token,
-      },
-      { headers: newHeaders },
-    );
-  } else {
-    return data({
+  return data(
+    {
       name: user.name,
       books: user.books,
       token,
-    });
-  }
+    },
+    { headers },
+  );
 }
 
 export async function action({ request }: Route.ActionArgs) {

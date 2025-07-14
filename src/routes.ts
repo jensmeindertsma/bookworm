@@ -29,6 +29,7 @@ export default [
       route("signout", "routes/signout.tsx"),
 
       route("dashboard", "routes/dashboard.tsx"),
+      route("settings", "routes/settings.tsx"),
 
       route("*", "routes/not-found.tsx"),
     ]),

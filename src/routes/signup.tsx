@@ -101,13 +101,9 @@ export default function SignUp({
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await redirectUser({ request, redirectTo: "/dashboard" });
 
-  const { token, newHeaders } = await session.getToken();
+  const { token, headers } = await session.getToken();
 
-  if (newHeaders) {
-    return data({ token }, { headers: newHeaders });
-  } else {
-    return data({ token });
-  }
+  return data({ token }, { headers });
 }
 
 export async function action({ request }: Route.ActionArgs) {

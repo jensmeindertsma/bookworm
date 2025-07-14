@@ -38,7 +38,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="mx-auto max-w-1/2 p-6 font-serif">
+      <body className="mx-auto p-6 font-serif sm:max-w-2/3 md:max-w-1/2">
         {children}
         <ScrollRestoration />
         <Scripts />

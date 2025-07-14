@@ -6,18 +6,34 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
   if (loaderData.isAuthenticated) {
     return (
       <>
-        <header className="mb-10 flex flex-row items-baseline">
+        <header className="mb-10 flex flex-row items-center">
           <Link to="/" className="block h-full p-2">
             <span className="font-serif text-2xl font-bold">Bookworm</span>
           </Link>
+
+          <nav className="w-full">
+            <ul className="flex h-full flex-row items-center justify-end">
+              {[
+                ["/dashboard", "Dashboard"],
+                ["/settings", "Settings"],
+              ].map(([url, name]) => (
+                <li className="ml-4 hover:underline" key={url}>
+                  <Link to={url} className="flex h-full rounded-xl p-2">
+                    {name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
           <Form
             method="post"
             action="/signout"
-            className="ml-auto flex flex-row items-baseline justify-end"
+            className="ml-4 inline-flex flex-row items-center justify-end"
           >
             <input type="hidden" name="token" value={loaderData.token} />
-            <button type="submit" className="p-2">
-              Sign Out
+            <button type="submit" className="p-2 whitespace-nowrap">
+              Sign out
             </button>
           </Form>
         </header>
@@ -41,7 +57,7 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
                 ["/signin", "Sign in"],
               ].map(([url, name]) => (
                 <li className="ml-4 hover:underline" key={url}>
-                  <Link to={url} className="ml-2 flex h-full rounded-xl p-2">
+                  <Link to={url} className="flex h-full rounded-xl p-2">
                     {name}
                   </Link>
                 </li>
@@ -58,17 +74,13 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { isAuthenticated, ...session } = await getSession({ request });
+  const session = await getSession({ request });
 
-  if (isAuthenticated) {
-    const { token, newHeaders } = await session.getToken();
+  if (session.isAuthenticated) {
+    const { token, headers } = await session.getToken();
 
-    if (newHeaders) {
-      return data({ isAuthenticated, token }, { headers: newHeaders });
-    } else {
-      return data({ isAuthenticated, token });
-    }
+    return data({ isAuthenticated: true as const, token }, { headers });
+  } else {
+    return data({ isAuthenticated: false as const });
   }
-
-  return data({ isAuthenticated });
 }
