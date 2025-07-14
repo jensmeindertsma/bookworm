@@ -6,36 +6,44 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
   if (loaderData.isAuthenticated) {
     return (
       <>
-        <header className="mb-10 flex flex-row items-center">
+        <header className="mb-10 flex flex-col md:flex-row">
           <Link to="/" className="block h-full p-2">
             <span className="font-serif text-2xl font-bold">Bookworm</span>
           </Link>
 
-          <nav className="w-full">
-            <ul className="flex h-full flex-row items-center justify-end">
-              {[
-                ["/dashboard", "Dashboard"],
-                ["/settings", "Settings"],
-              ].map(([url, name]) => (
-                <li className="ml-4 hover:underline" key={url}>
-                  <Link to={url} className="flex h-full rounded-xl p-2">
-                    {name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div className="flex flex-row md:ml-auto">
+            <nav className="md:w-full">
+              <ul className="flex h-full flex-row items-center justify-end">
+                {[
+                  ["/dashboard", "Dashboard"],
+                  ["/settings", "Settings"],
+                ].map(([url, name]) => (
+                  <li
+                    className="mr-4 hover:underline md:mr-0 md:ml-4"
+                    key={url}
+                  >
+                    <Link to={url} className="flex h-full rounded-xl p-2">
+                      {name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
 
-          <Form
-            method="post"
-            action="/signout"
-            className="ml-4 inline-flex flex-row items-center justify-end"
-          >
-            <input type="hidden" name="token" value={loaderData.token} />
-            <button type="submit" className="p-2 whitespace-nowrap">
-              Sign out
-            </button>
-          </Form>
+            <Form
+              method="post"
+              action="/signout"
+              className="inline-flex flex-row items-center justify-end"
+            >
+              <input type="hidden" name="token" value={loaderData.token} />
+              <button
+                type="submit"
+                className="p-2 whitespace-nowrap hover:underline"
+              >
+                Sign out
+              </button>
+            </Form>
+          </div>
         </header>
 
         <main className="px-2">

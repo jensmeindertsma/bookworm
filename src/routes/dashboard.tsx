@@ -9,25 +9,65 @@ export default function Dashboard({
   loaderData,
   actionData: feedback,
 }: Route.ComponentProps) {
+  const sectionStyle = "flex flex-col mb-2";
+  const labelStyle = "mb-1 underline";
+  const inputStyle =
+    "text-black dark:text-white italic placeholder:text-gray-400 placeholder:italic";
+  const errorStyle = "mt-2 underline decoration-red-600";
+  const buttonStyle =
+    "mt-2 w-30 bg-black p-2 text-center text-white dark:bg-white dark:text-black";
+
   return (
     <>
-      <h1>Dashboard</h1>
-      <p>Welcome back, {loaderData.name}</p>
-      <p>ADD BOOK</p>
+      <p className="mb-2">Logged in as {loaderData.name}.</p>
+      <p>You are currently reading {loaderData.books.length} books.</p>
+
+      <hr className="my-8 border-t-2 border-white" />
+
       <Form method="post">
         <input type="hidden" name="token" value={loaderData.token} />
         <input type="hidden" name="kind" value="create" />
 
-        <p>Add a new book</p>
-        <label htmlFor="name">Name</label>
-        <input type="text" required id="name" name="name" />
-        {feedback?.kind === "create" && <p>{feedback.name}</p>}
+        <h2 className="mb-2 text-xl">Add a new book</h2>
 
-        <label htmlFor="pages">Page Count</label>
-        <input type="text" required id="pages" name="pages" />
-        {feedback?.kind === "create" && <p>{feedback.pages}</p>}
+        <section className={sectionStyle}>
+          <label htmlFor="name" className={labelStyle}>
+            Name
+          </label>
+          <input
+            type="text"
+            required
+            id="name"
+            name="name"
+            minLength={2}
+            className={inputStyle}
+            placeholder="Tommy's great adventure"
+          />
+          <p className={errorStyle}>
+            {feedback?.kind === "create" && feedback.name}
+          </p>
+        </section>
 
-        <button type="submit">Add</button>
+        <section className={sectionStyle}>
+          <label htmlFor="pages" className={labelStyle}>
+            Pages
+          </label>
+          <input
+            type="number"
+            required
+            id="pages"
+            name="pages"
+            className={inputStyle}
+            placeholder="123"
+          />
+          <p className={errorStyle}>
+            {feedback?.kind === "create" && feedback.name}
+          </p>
+        </section>
+
+        <button type="submit" className={buttonStyle}>
+          Add new book
+        </button>
       </Form>
 
       <ul>

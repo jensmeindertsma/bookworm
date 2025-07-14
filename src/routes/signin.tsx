@@ -11,7 +11,7 @@ export default function SignIn({
   actionData: feedback,
 }: Route.ComponentProps) {
   const sectionStyle = "flex flex-col mb-5";
-  const labelStyle = "mb-1 underline";
+  const labelStyle = "mb-1 underline underline-offset-3";
   const inputStyle =
     "text-black dark:text-white italic placeholder:text-gray-400 placeholder:italic";
   const errorStyle = "mt-2 underline decoration-red-600";
@@ -60,7 +60,7 @@ export default function SignIn({
           type="submit"
           className="mt-5 w-30 bg-black p-2 text-center text-white dark:bg-white dark:text-black"
         >
-          Sign Up
+          Sign In
         </button>
       </Form>
     </>

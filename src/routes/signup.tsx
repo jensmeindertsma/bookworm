@@ -11,7 +11,7 @@ export default function SignUp({
   actionData: feedback,
 }: Route.ComponentProps) {
   const sectionStyle = "flex flex-col mb-5";
-  const labelStyle = "mb-1 underline";
+  const labelStyle = "mb-1 underline underline-offset-3";
   const inputStyle =
     "text-black dark:text-white italic placeholder:text-gray-400 placeholder:italic";
   const errorStyle = "mt-2 underline decoration-red-600";
