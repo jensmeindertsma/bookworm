@@ -1,6 +1,6 @@
 import type { ZodError } from "zod";
 
-export function convertFormError<F extends Record<string, unknown>>(
+export function parseFormError<F extends Record<string, unknown>>(
   error: ZodError<F>,
 ): { [K in keyof F]: string | null } {
   const allKeys = Object.keys(error.flatten().fieldErrors) as Array<keyof F>;
@@ -19,34 +19,32 @@ export function convertFormError<F extends Record<string, unknown>>(
 }
 
 export function getFormErrors<
-  T extends { kind: string },
-  K extends T["kind"],
-  F extends Exclude<keyof Extract<T, { kind: K }> & string, "kind">,
->({
-  formError,
-}: {
+  T extends Record<string, unknown>,
+  D extends keyof T & string,
+  K extends T[D] & string,
+  F extends Extract<T, Record<D, K>>,
+  Result extends {
+    [Key in Exclude<keyof F, D>]: string | null;
+  },
+>(params: {
   formError: ZodError<T>;
-  kind: K;
-}): Record<F, string | null> {
+  discriminant: {
+    name: D;
+    value: K;
+  };
+}): Result {
+  const { formError } = params;
+
   const flattened = (formError as ZodError<Record<string, unknown>>).flatten();
 
-  type Variant = Extract<T, { kind: K }>;
-  type Fields = Exclude<keyof Variant & string, "kind">;
+  type Variant = Extract<T, Record<D, K>>;
+  type Field = Exclude<keyof Variant, D> & string;
 
-  const errors = {} as Record<Fields, string | null>;
+  const result: Partial<Record<Field, string | null>> = {};
 
-  for (const field of Object.keys(flattened.fieldErrors) as Fields[]) {
-    errors[field] =
-      (formError as ZodError<Record<string, unknown>>).flatten().fieldErrors[
-        field
-      ]?.[0] ?? null;
+  for (const field of Object.keys({} as Omit<Variant, D>) as Field[]) {
+    result[field] = flattened.fieldErrors[field]?.[0] ?? null;
   }
 
-  (Object.keys(errors) as Fields[]).forEach((field) => {
-    if (!(field in errors)) {
-      errors[field] = null;
-    }
-  });
-
-  return errors;
+  return result as Result;
 }

@@ -160,17 +160,31 @@ export async function action({ request }: Route.ActionArgs) {
         return data(
           {
             kind,
-            ...getFormErrors({ formError, kind }),
+            ...getFormErrors({
+              formError,
+              discriminant: {
+                name: "kind",
+                value: kind,
+              },
+            }),
           },
           400,
         );
       }
+    }
 
+    switch (kind) {
       case "edit": {
         return data(
           {
             kind,
-            ...getFormErrors({ formError, kind }),
+            ...getFormErrors({
+              formError,
+              discriminant: {
+                name: "kind",
+                value: kind,
+              },
+            }),
           },
           400,
         );

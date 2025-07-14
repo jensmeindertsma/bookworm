@@ -1,6 +1,6 @@
 import type { Route } from "./+types/signin";
 import { database } from "~/services/database.server";
-import { convertFormError } from "~/services/form.server";
+import { parseFormError } from "~/services/form.server";
 import { redirectUser } from "~/services/session.server";
 import bcrypt from "bcrypt";
 import { data, Form } from "react-router";
@@ -97,7 +97,7 @@ export async function action({ request }: Route.ActionArgs) {
     .safeParse(Object.fromEntries(formData));
 
   if (error) {
-    return data(convertFormError(error), 400);
+    return data(parseFormError(error), 400);
   }
 
   const { email, password } = fields;

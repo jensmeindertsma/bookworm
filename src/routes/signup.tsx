@@ -1,6 +1,6 @@
 import type { Route } from "./+types/signup";
 import { database } from "~/services/database.server";
-import { convertFormError } from "~/services/form.server";
+import { parseFormError } from "~/services/form.server";
 import { redirectUser } from "~/services/session.server";
 import bcrypt from "bcrypt";
 import { data, Form } from "react-router";
@@ -134,7 +134,7 @@ export async function action({ request }: Route.ActionArgs) {
     .safeParse(Object.fromEntries(formData));
 
   if (!validation.success) {
-    return data(convertFormError(validation.error), 400);
+    return data(parseFormError(validation.error), 400);
   }
 
   const { name, email, password } = validation.data;
