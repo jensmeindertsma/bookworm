@@ -6,6 +6,8 @@ export default function ErrorLayout() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  console.error(error);
+
   if (isRouteErrorResponse(error)) {
     return (
       <>
