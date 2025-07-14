@@ -4,7 +4,6 @@ import { data, Form, Link, Outlet } from "react-router";
 
 export default function MainLayout({ loaderData }: Route.ComponentProps) {
   if (loaderData.isAuthenticated) {
-    console.log("form has token", loaderData.token);
     return (
       <>
         <header className="mb-10 flex flex-row items-baseline">
