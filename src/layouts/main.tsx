@@ -46,7 +46,7 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
           </div>
         </header>
 
-        <main className="px-2">
+        <main className="px-2 pb-16">
           <Outlet />
         </main>
       </>

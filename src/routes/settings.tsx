@@ -9,25 +9,25 @@ export default function Settings({
     <>
       <Form method="post">
         <input type="hidden" name="token" value={token} />
-        <input type="hidden" name="kind" value="rename" />
+        <input type="hidden" name="intent" value="rename" />
 
         <button type="submit">Change username</button>
       </Form>
       <Form method="post">
         <input type="hidden" name="token" value={token} />
-        <input type="hidden" name="kind" value="change-email" />
+        <input type="hidden" name="intent" value="change-email" />
 
         <button type="submit">Change email address</button>
       </Form>
       <Form method="post">
         <input type="hidden" name="token" value={token} />
-        <input type="hidden" name="kind" value="change-password" />
+        <input type="hidden" name="intent" value="change-password" />
 
         <button type="submit">Change password</button>
       </Form>
       <Form method="post">
         <input type="hidden" name="token" value={token} />
-        <input type="hidden" name="kind" value="delete" />
+        <input type="hidden" name="intent" value="delete" />
 
         <button type="submit">Delete account</button>
       </Form>

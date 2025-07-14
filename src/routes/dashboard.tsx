@@ -2,13 +2,23 @@ import type { Route } from "./+types/dashboard";
 import { database } from "~/services/database.server";
 import { getFormErrors } from "~/services/form.server";
 import { verifySession } from "~/services/session.server";
-import { data, Form, redirect } from "react-router";
+import { useEffect, useRef } from "react";
+import { data, Form, redirect, useNavigation } from "react-router";
 import z from "zod";
 
 export default function Dashboard({
   loaderData,
   actionData: feedback,
 }: Route.ComponentProps) {
+  const navigation = useNavigation();
+  const addFormRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (navigation.state === "idle") {
+      addFormRef.current?.reset();
+    }
+  }, [navigation.state]);
+
   const sectionStyle = "flex flex-col mb-2";
   const labelStyle = "mb-1 underline";
   const inputStyle =
@@ -22,11 +32,11 @@ export default function Dashboard({
       <p className="mb-2">Logged in as {loaderData.name}.</p>
       <p>You are currently reading {loaderData.books.length} books.</p>
 
-      <hr className="my-8 border-t-2 border-white" />
+      <hr className="my-8 border-t-2 border-black dark:border-white" />
 
-      <Form method="post">
+      <Form method="post" ref={addFormRef}>
         <input type="hidden" name="token" value={loaderData.token} />
-        <input type="hidden" name="kind" value="create" />
+        <input type="hidden" name="intent" value="create" />
 
         <h2 className="mb-2 text-xl">Add a new book</h2>
 
@@ -44,24 +54,24 @@ export default function Dashboard({
             placeholder="Tommy's great adventure"
           />
           <p className={errorStyle}>
-            {feedback?.kind === "create" && feedback.name}
+            {feedback?.form === "create" && feedback.name}
           </p>
         </section>
 
         <section className={sectionStyle}>
-          <label htmlFor="pages" className={labelStyle}>
-            Pages
+          <label htmlFor="pageCount" className={labelStyle}>
+            Page Count
           </label>
           <input
             type="number"
             required
-            id="pages"
-            name="pages"
+            id="pageCount"
+            name="pageCount"
             className={inputStyle}
             placeholder="123"
           />
           <p className={errorStyle}>
-            {feedback?.kind === "create" && feedback.name}
+            {feedback?.form === "create" && feedback.name}
           </p>
         </section>
 
@@ -73,17 +83,17 @@ export default function Dashboard({
       <ul>
         {loaderData.books.map((book) => (
           <li key={book.id}>
+            <hr className="my-8 border-t-2 border-black dark:border-white" />
+            <p className="text-xl">{book.name}</p>
             <p>
-              {book.name} (currently on page {book.progress})
+              (currently on page {book.progress}/{book.pageCount})
             </p>
-            <p>EDIT BOOK</p>
             <Form method="post">
               <input type="hidden" name="token" value={loaderData.token} />
-              <input type="hidden" name="kind" value="edit" />
-
+              <input type="hidden" name="intent" value="saveProgress" />
               <input type="hidden" name="id" value={book.id} />
 
-              <label htmlFor="progress">Edit Progress</label>
+              <label htmlFor="progress">Save Progress</label>
               <input
                 type="number"
                 required
@@ -91,17 +101,106 @@ export default function Dashboard({
                 name="progress"
                 placeholder={book.progress.toString()}
               />
-              {feedback?.kind === "edit" && <p>{feedback.progress}</p>}
 
-              <button type="submit">Save progress</button>
+              <button type="submit" className={buttonStyle}>
+                Save progress
+              </button>
             </Form>
-            <p>DELETE BOOK</p>
-            <Form method="post">
-              <input type="hidden" name="token" value={loaderData.token} />
-              <input type="hidden" name="kind" value="delete" />
+            {feedback?.form === "saveDetails" && feedback.id === book.id ? (
+              <Form method="post">
+                <input type="hidden" name="token" value={loaderData.token} />
+                <input type="hidden" name="intent" value="saveDetails" />
+                <input type="hidden" name="id" value={book.id} />
 
-              <button type="submit">Delete Book</button>
-            </Form>
+                <section className={sectionStyle}>
+                  <label htmlFor="name" className={labelStyle}>
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    minLength={2}
+                    className={inputStyle}
+                    defaultValue={book.name}
+                  />
+                  <p className={errorStyle}>
+                    {feedback?.form === "saveDetails" && feedback.name}
+                  </p>
+                </section>
+
+                <section className={sectionStyle}>
+                  <label htmlFor="pageCount" className={labelStyle}>
+                    Page Count
+                  </label>
+                  <input
+                    type="number"
+                    id="pageCount"
+                    name="pageCount"
+                    className={inputStyle}
+                    defaultValue={String(book.pageCount)}
+                  />
+                  <p className={errorStyle}>
+                    {feedback?.form === "saveDetails" && feedback.pageCount}
+                  </p>
+                </section>
+
+                <button
+                  type="submit"
+                  name="intent"
+                  value="cancel"
+                  className={buttonStyle}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className={buttonStyle}>
+                  Save Details
+                </button>
+              </Form>
+            ) : (
+              <Form method="post">
+                <input type="hidden" name="token" value={loaderData.token} />
+                <input type="hidden" name="intent" value="editDetails" />
+                <input type="hidden" name="id" value={book.id} />
+
+                <button type="submit" className={buttonStyle}>
+                  Edit Details
+                </button>
+              </Form>
+            )}
+            {feedback?.form === "confirmDelete" ? (
+              <Form method="post">
+                <input type="hidden" name="token" value={loaderData.token} />
+                <input type="hidden" name="id" value={book.id} />
+
+                <button
+                  type="submit"
+                  name="intent"
+                  value="cancel"
+                  className={buttonStyle}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  name="intent"
+                  value="confirmDelete"
+                  className={buttonStyle}
+                >
+                  Confirm
+                </button>
+              </Form>
+            ) : (
+              <Form method="post">
+                <input type="hidden" name="token" value={loaderData.token} />
+                <input type="hidden" name="intent" value="delete" />
+                <input type="hidden" name="id" value={book.id} />
+
+                <button type="submit" className={buttonStyle}>
+                  Delete Book
+                </button>
+              </Form>
+            )}
           </li>
         ))}
       </ul>
@@ -146,23 +245,31 @@ export async function action({ request }: Route.ActionArgs) {
 
   session.verifyToken({ formData });
 
-  const { error: kindError, data: kind } = z
-    .enum(["create", "edit"])
-    .safeParse(formData.get("kind"));
+  const { error: intentError, data: intent } = z
+    .enum([
+      "create",
+      "saveProgress",
+      "editDetails",
+      "saveDetails",
+      "delete",
+      "confirmDelete",
+      "cancel",
+    ])
+    .safeParse(formData.get("intent"));
 
-  if (kindError) {
-    throw new Error(`Invalid form kind (received ${kind})`);
+  if (intentError) {
+    throw new Error(`Invalid form intent (received ${intent})`);
   }
 
   const { data: fields, error: formError } = z
-    .discriminatedUnion("kind", [
+    .discriminatedUnion("intent", [
       z.object({
-        kind: z.literal("create"),
+        intent: z.literal("create"),
         name: z.string({
           required_error: "This field is required",
           invalid_type_error: "Please provide a valid name",
         }),
-        pages: z
+        pageCount: z
           .string({
             required_error: "This field is required",
           })
@@ -172,64 +279,93 @@ export async function action({ request }: Route.ActionArgs) {
           }),
       }),
       z.object({
-        kind: z.literal("edit"),
+        intent: z.literal("saveProgress"),
+        id: z.string(),
         progress: z
-          .string({
-            required_error: "This field is required",
-          })
+          .string()
           .transform((field) => Number(field))
           .refine((field) => !Number.isNaN(field) && field > 0, {
-            message: "Please provide a valid progress value",
+            message: "Please provide a valid number",
           }),
+      }),
+      z.object({
+        intent: z.literal("editDetails"),
         id: z.string(),
+      }),
+      z.object({
+        intent: z.literal("saveDetails"),
+        id: z.string(),
+        name: z.string().optional(),
+        pageCount: z
+          .string()
+          .optional()
+          .transform((field) => Number(field))
+          .refine((field) => !Number.isNaN(field) && field > 0, {
+            message: "Please provide a valid number",
+          }),
+      }),
+      z.object({
+        intent: z.literal("delete"),
+        id: z.string(),
+      }),
+      z.object({
+        intent: z.literal("confirmDelete"),
+        id: z.string(),
+      }),
+      z.object({
+        intent: z.literal("cancel"),
       }),
     ])
     .safeParse(Object.fromEntries(formData));
 
   if (formError) {
-    switch (kind) {
+    switch (intent) {
       case "create": {
         return data(
           {
-            kind,
+            form: intent,
             ...getFormErrors({
               formError,
               discriminant: {
-                name: "kind",
-                value: kind,
+                name: "intent",
+                value: intent,
               },
             }),
           },
           400,
         );
       }
-    }
 
-    switch (kind) {
-      case "edit": {
+      case "saveDetails": {
         return data(
           {
-            kind,
+            form: intent,
             ...getFormErrors({
               formError,
               discriminant: {
-                name: "kind",
-                value: kind,
+                name: "intent",
+                value: intent,
               },
             }),
           },
           400,
+        );
+      }
+
+      default: {
+        throw new Error(
+          `Error for unhandled form intent "${intent}" + ${formError}`,
         );
       }
     }
   }
 
-  switch (fields.kind) {
+  switch (fields.intent) {
     case "create": {
       await database.book.create({
         data: {
           name: fields.name,
-          pages: fields.pages,
+          pageCount: fields.pageCount,
           progress: 0,
           userId: session.id,
         },
@@ -238,18 +374,78 @@ export async function action({ request }: Route.ActionArgs) {
       break;
     }
 
-    case "edit": {
+    case "saveProgress": {
       await database.book.update({
+        where: { id: fields.id },
+        data: { progress: fields.progress },
+      });
+
+      break;
+    }
+
+    case "editDetails": {
+      // Switch to second stage where the actual form is shown.
+      return data({
+        form: "saveDetails" as const,
+
+        // TODO: auto-edit this when adding a new property
+        id: fields.id,
+        name: null,
+        pageCount: null,
+      });
+    }
+
+    case "saveDetails": {
+      if (fields.name) {
+        await database.book.update({
+          where: {
+            id: fields.id,
+          },
+          data: {
+            name: fields.name,
+          },
+        });
+      }
+
+      if (fields.pageCount) {
+        await database.book.update({
+          where: {
+            id: fields.id,
+          },
+          data: {
+            pageCount: fields.pageCount,
+          },
+        });
+      }
+
+      break;
+    }
+
+    case "cancel": {
+      // Switch to second stage where the actual form is shown.
+      return data({
+        form: "editDetails" as const,
+      });
+    }
+
+    case "delete": {
+      return data({
+        form: "confirmDelete" as const,
+      });
+    }
+
+    case "confirmDelete": {
+      await database.book.delete({
         where: {
           id: fields.id,
-        },
-        data: {
-          progress: fields.progress,
         },
       });
 
       break;
     }
+
+    default:
+      throw new Error(`Unhandled form intent "${intent}"`);
   }
 
   return redirect("/dashboard");
