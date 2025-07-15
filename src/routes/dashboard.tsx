@@ -93,7 +93,9 @@ export default function Dashboard({
               <input type="hidden" name="intent" value="saveProgress" />
               <input type="hidden" name="id" value={book.id} />
 
-              <label htmlFor="progress">Save Progress</label>
+              <label htmlFor="progress" className={labelStyle}>
+                Progress
+              </label>
               <input
                 type="number"
                 required
