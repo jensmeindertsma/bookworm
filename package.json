@@ -2,7 +2,7 @@
   "name": "@jensmeindertsma/bookworm",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.12.4",
+  "packageManager": "pnpm@10.13.1",
   "scripts": {
     "build": "prisma generate && react-router build",
     "clean": "rimraf build",
@@ -19,8 +19,8 @@
     "typegen": "react-router typegen"
   },
   "dependencies": {
-    "@prisma/adapter-better-sqlite3": "^6.11.1",
-    "@prisma/client": "^6.11.1",
+    "@prisma/adapter-better-sqlite3": "^6.12.0",
+    "@prisma/client": "^6.12.0",
     "@react-router/node": "^7.6.3",
     "@react-router/serve": "^7.6.3",
     "bcrypt": "^6.0.0",
@@ -29,10 +29,10 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^7.6.3",
-    "zod": "^3.25.73"
+    "zod": "^4.0.5"
   },
   "devDependencies": {
-    "@eslint/js": "^9.30.1",
+    "@eslint/js": "^9.31.0",
     "@react-router/dev": "^7.6.3",
     "@tailwindcss/vite": "^4.1.11",
     "@types/bcrypt": "^5.0.2",
@@ -41,17 +41,17 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "dotenv-cli": "^8.0.0",
-    "eslint": "^9.30.1",
+    "eslint": "^9.31.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.6.13",
-    "prisma": "^6.11.1",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "prisma": "^6.12.0",
     "rimraf": "^6.0.1",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.35.1",
-    "vite": "^7.0.2",
+    "typescript-eslint": "^8.37.0",
+    "vite": "^7.0.4",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }

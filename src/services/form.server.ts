@@ -8,7 +8,7 @@ export function parseFormError<F extends Record<string, unknown>>(
     [K in keyof F]: string | null;
   };
 
-  for (const issue of error.errors) {
+  for (const issue of error.issues) {
     const key = issue.path[0];
     if (typeof key === "string" && key in result) {
       result[key as keyof F] = issue.message;

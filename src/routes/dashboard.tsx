@@ -268,12 +268,11 @@ export async function action({ request }: Route.ActionArgs) {
       z.object({
         intent: z.literal("create"),
         name: z.string({
-          required_error: "This field is required",
-          invalid_type_error: "Please provide a valid name",
+          error: "This field is required",
         }),
         pageCount: z
           .string({
-            required_error: "This field is required",
+            error: "This field is required",
           })
           .transform((field) => Number(field))
           .refine((field) => !Number.isNaN(field) && field > 0, {
