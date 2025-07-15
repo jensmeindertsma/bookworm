@@ -11,3 +11,5 @@ Simply track digital reading progress.
 - Implement `/settings`
 - Improve mobile layout of buttons
 - Check dark mode
+- Progress cannot exceed page count
+- set max to page count at 5000 to prevent buffer overflow
