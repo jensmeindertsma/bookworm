@@ -14,10 +14,7 @@ export default function MainLayout({ loaderData }: Route.ComponentProps) {
           <div className="flex flex-row md:ml-auto">
             <nav className="md:w-full">
               <ul className="flex h-full flex-row items-center justify-end">
-                {[
-                  ["/dashboard", "Dashboard"],
-                  ["/settings", "Settings"],
-                ].map(([url, name]) => (
+                {[["/dashboard", "Dashboard"]].map(([url, name]) => (
                   <li
                     className="mr-4 hover:underline md:mr-0 md:ml-4"
                     key={url}

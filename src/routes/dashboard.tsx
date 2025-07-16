@@ -1,4 +1,5 @@
 import type { Route } from "./+types/dashboard";
+import { Button } from "~/components/button";
 import { database } from "~/services/database.server";
 import { getFormErrors } from "~/services/form.server";
 import { verifySession } from "~/services/session.server";
@@ -24,8 +25,6 @@ export default function Dashboard({
   const inputStyle =
     "text-black dark:text-white italic placeholder:text-gray-400 placeholder:italic";
   const errorStyle = "mt-2 underline decoration-red-600";
-  const buttonStyle =
-    "mt-2 w-30 bg-black p-2 text-center text-white dark:bg-white dark:text-black";
 
   return (
     <>
@@ -75,9 +74,7 @@ export default function Dashboard({
           </p>
         </section>
 
-        <button type="submit" className={buttonStyle}>
-          Add new book
-        </button>
+        <Button>Add new book</Button>
       </Form>
 
       <ul>
@@ -88,7 +85,7 @@ export default function Dashboard({
             <p>
               (currently on page {book.progress}/{book.pageCount})
             </p>
-            <Form method="post">
+            <Form method="post" className="flex flex-col">
               <input type="hidden" name="token" value={loaderData.token} />
               <input type="hidden" name="intent" value="saveProgress" />
               <input type="hidden" name="id" value={book.id} />
@@ -101,17 +98,15 @@ export default function Dashboard({
                 required
                 id="progress"
                 name="progress"
+                max={book.pageCount}
                 placeholder={book.progress.toString()}
               />
 
-              <button type="submit" className={buttonStyle}>
-                Save progress
-              </button>
+              <Button>Save progress</Button>
             </Form>
             {feedback?.form === "saveDetails" && feedback.id === book.id ? (
               <Form method="post">
                 <input type="hidden" name="token" value={loaderData.token} />
-                <input type="hidden" name="intent" value="saveDetails" />
                 <input type="hidden" name="id" value={book.id} />
 
                 <section className={sectionStyle}>
@@ -139,6 +134,7 @@ export default function Dashboard({
                     type="number"
                     id="pageCount"
                     name="pageCount"
+                    max={5000}
                     className={inputStyle}
                     defaultValue={String(book.pageCount)}
                   />
@@ -147,17 +143,12 @@ export default function Dashboard({
                   </p>
                 </section>
 
-                <button
-                  type="submit"
-                  name="intent"
-                  value="cancel"
-                  className={buttonStyle}
-                >
+                <Button kind="alternative" name="intent" value="cancel">
                   Cancel
-                </button>
-                <button type="submit" className={buttonStyle}>
+                </Button>
+                <Button name="intent" value="saveDetails">
                   Save Details
-                </button>
+                </Button>
               </Form>
             ) : (
               <Form method="post">
@@ -165,32 +156,20 @@ export default function Dashboard({
                 <input type="hidden" name="intent" value="editDetails" />
                 <input type="hidden" name="id" value={book.id} />
 
-                <button type="submit" className={buttonStyle}>
-                  Edit Details
-                </button>
+                <Button>Edit Details</Button>
               </Form>
             )}
-            {feedback?.form === "confirmDelete" ? (
-              <Form method="post">
+            {feedback?.form === "confirmDelete" && feedback.id == book.id ? (
+              <Form method="post" className="flex flex-row">
                 <input type="hidden" name="token" value={loaderData.token} />
                 <input type="hidden" name="id" value={book.id} />
 
-                <button
-                  type="submit"
-                  name="intent"
-                  value="cancel"
-                  className={buttonStyle}
-                >
+                <Button kind="alternative" name="intent" value="cancel">
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  name="intent"
-                  value="confirmDelete"
-                  className={buttonStyle}
-                >
-                  Confirm
-                </button>
+                </Button>
+                <Button name="intent" value="confirmDelete" className="ml-2">
+                  Delete
+                </Button>
               </Form>
             ) : (
               <Form method="post">
@@ -198,9 +177,7 @@ export default function Dashboard({
                 <input type="hidden" name="intent" value="delete" />
                 <input type="hidden" name="id" value={book.id} />
 
-                <button type="submit" className={buttonStyle}>
-                  Delete Book
-                </button>
+                <Button>Delete</Button>
               </Form>
             )}
           </li>
@@ -276,7 +253,10 @@ export async function action({ request }: Route.ActionArgs) {
           })
           .transform((field) => Number(field))
           .refine((field) => !Number.isNaN(field) && field > 0, {
-            message: "Please provide a valid progress value",
+            error: "Please provide a valid progress value",
+          })
+          .refine((field) => field <= 5000, {
+            error: "Too many pages!",
           }),
       }),
       z.object({
@@ -286,7 +266,7 @@ export async function action({ request }: Route.ActionArgs) {
           .string()
           .transform((field) => Number(field))
           .refine((field) => !Number.isNaN(field) && field > 0, {
-            message: "Please provide a valid number",
+            error: "Please provide a valid number",
           }),
       }),
       z.object({
@@ -302,7 +282,7 @@ export async function action({ request }: Route.ActionArgs) {
           .optional()
           .transform((field) => Number(field))
           .refine((field) => !Number.isNaN(field) && field > 0, {
-            message: "Please provide a valid number",
+            error: "Please provide a valid number",
           }),
       }),
       z.object({
@@ -376,6 +356,25 @@ export async function action({ request }: Route.ActionArgs) {
     }
 
     case "saveProgress": {
+      const fetch = await database.book.findUnique({
+        where: { id: fields.id },
+        select: { pageCount: true },
+      });
+
+      if (!fetch) {
+        throw new Error("Can't save progress of nonexisting book");
+      }
+
+      if (fetch.pageCount < fields.progress) {
+        return data(
+          {
+            form: fields.intent,
+            pageCount: "Too high!",
+          },
+          400,
+        );
+      }
+
       await database.book.update({
         where: { id: fields.id },
         data: { progress: fields.progress },
@@ -432,6 +431,7 @@ export async function action({ request }: Route.ActionArgs) {
     case "delete": {
       return data({
         form: "confirmDelete" as const,
+        id: fields.id,
       });
     }
 
