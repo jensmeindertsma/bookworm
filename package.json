@@ -12,8 +12,7 @@
     "dev": "prisma generate && react-router dev",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
-    "lint:check": "eslint --cache --max-warnings 0 .",
-    "lint:fix": "eslint --cache --fix .",
+    "lint": "eslint --cache --max-warnings 0 .",
     "start": "dotenv -- react-router-serve ./build/server/index.js",
     "typecheck": "prisma generate && react-router typegen && tsc",
     "typegen": "react-router typegen"
